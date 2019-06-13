@@ -1,0 +1,82 @@
+
+###############
+# PRIME is a PRedictor of class I IMmunogenic Epitopes. It combines predictions of binding to HLA molecules and propensity of amino acids for immunogenicity.
+#
+# PRIME1.0 can be used freely by academic groups for non-commercial purposes (see license).
+# The product is provided free of charge, and, therefore, on an "as is"
+#  basis, without warranty of any kind.
+#
+# FOR-PROFIT USERS
+# If you plan to use PRIME (version 1.0) or any data provided with the script in any for-profit
+# application, you are required to obtain a separate  license.
+# To do so, please contact eauffarth@licr.org at the Ludwig Institute for  Cancer Research Ltd.
+#
+# If you use PRIME1.0 in a publication, please cite:
+# The immunogenicity scale of amino acids, (2019).
+#
+# For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
+#
+# Copyright (2019) David Gfeller
+###############
+
+############
+INSTALLATION
+############
+
+For Mac and Linux:
+
+1) Dowload the PRIME1.0.zip file and move it to a directory
+of your choice, where you have writing permissions.
+
+2) Unzip the PRIME1.0.zip package.
+
+3) Open the PRIME file and replace lib_path by the
+path to the PRIME1.0/lib directory where you have installed the script
+
+4) To run it from anywhere on your computer, add the PRIME1.0 directory to your path.
+
+5) PRIME requires MixMHCpred v2.0.2 or above to be installed on your computer (https://github.com/GfellerLab/MixMHCpred) and be in your PATH (if not in your PATH, you can use the '-mix PATH_TO_MIXMHCPRED' command line option).
+
+6) To test your installation, make sure you are in the PRIME1.0/ directory and run the command (should not take more than a few seconds):
+
+   ./PRIME -i test/test.txt -o test/out.txt -a A0201,A0101
+
+The output file test/out.txt should be exatly the same as test/out_compare.txt
+
+
+########
+RUNNING
+########
+
+Command:
+PRIME -i input_file -o output_dir -a allele1,allele2
+
+input_file:
+File listing all the peptides. Ideally a fasta file, but text files
+are supported and lines starting with ">" are skipped.
+All peptides should between 8 and 14-mers.
+
+allele:
+HLA-I allele. Use the simple nomenclature like A0101.
+A01:01, A*01:01 or HLA-A*01:01 are also supported, but not
+recommanded. If you want to make predictions with multiple
+alleles, list the different alleles separated by a single comma ","
+(e.g. -a A0101,A2501,B0801,B1801).
+
+output_file:
+The name of the output file.
+
+
+########
+Output
+########
+
+PRIME.txt provides the output of the immunogenicity predictions.
+Column 1: Peptide sequence
+Column 2: Lowest %Rank for PRIME score across the different alleles
+Column 3: PRIME Score corresponding to alleles with the lowest %Rank
+Column 4: Predicted binding score (MixMHCpred %Rank)
+Column 5: Best allele
+Additional columns: %Rank, scores and MixMHCpred %Rank for each allele.
+
+As in NetMHCpan, %Rank (Column 2) indicates the percentile of randomly generated peptides that would have a score higher or equal.
