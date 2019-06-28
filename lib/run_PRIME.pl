@@ -46,6 +46,8 @@ foreach $h (@allele_input){
     push @allele_list, $h;
 }
 
+#print "@allele_list\n";
+
 ###########
 # Check input file
 ###########
@@ -68,8 +70,9 @@ while($l=<IN>){
 close IN;
 
 if(scalar @peptide == 0){
-    print "Empty peptide file\n";
-    exit;
+    #print "Empty peptide file\n";
+    #exit;
+    die "Empty peptide file\n";
 }
 
 my $Lmin=8;
@@ -88,14 +91,16 @@ foreach $p (@peptide){
     $ct2=0;
     foreach $s (@seq){
 	if(!exists $map{$s}){
-	    print "Error in input sequence - unknown amino acids $s: $p\n";
-	    exit;
+	    #print "Error in input sequence - unknown amino acids $s: $p\n";
+	    die "Error in input sequence - unknown amino acids $s: $p\n";
+	    #exit;
 	} 
 	$ct2++;
     }
     if($ct2 < $Lmin || $ct2 > $Lmax){
-	print "Incompatible peptide length: $p\t$ct2. \nOnly peptides of length $Lmin to $Lmax are supported\n";
-	exit;
+	#print "Incompatible peptide length: $p\t$ct2. \nOnly peptides of length $Lmin to $Lmax are supported\n";
+	die "Incompatible peptide length: $p\t$ct2. \nOnly peptides of length $Lmin to $Lmax are supported\n";
+	#exit;
     } 
 }
 
@@ -138,8 +143,9 @@ my @b;
 my @allele_list_pred=();
 for(my $i=0; $i<$nh; $i++){
     if(!exists $pres{$allele_list[$i]}){
-	print "Predictions cannot be run for $allele_list[$i]\n";
-	exit;
+	#print "Predictions cannot be run for $allele_list[$i]\n";
+	die "Predictions cannot be run for $allele_list[$i]\n";
+	#exit;
     } else{
 	$cond=1;
 	if(! exists $maph{$allele_list[$i]}){
