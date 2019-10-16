@@ -66,6 +66,10 @@ alleles, list the different alleles separated by a single comma ","
 output_file:
 The name of the output file.
 
+Parameters:
+
+-mix: Give the path to MixMHCpred. Version 2.0.2 or above is required
+-predBinding: Decide whether to use MixMHCpred or NetMHCpan (default is MixMHCpred). Importantly, PRIME was trained using MixMHCpred. Although the %rank of NetMHCpan are quite similar to those of MixMHCpred and span the sam range of values, PRIME predictions may be less accurate when using NetMHCpan. Using NetMHCpan also implies that NetMHCpan4.0 is installed in your computer and available in your path. NetMHCpan is required for predictions in non-human MHC alleles.
 
 ########
 Output

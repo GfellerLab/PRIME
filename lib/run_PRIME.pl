@@ -13,14 +13,15 @@ use strict;
 use Getopt::Long;
 
 
-my ($alleles, $input, $dir, $output_file, $lib_dir, $MixMHCpred_dir);
+my ($alleles, $input, $dir, $output_file, $lib_dir, $MixMHCpred_dir, $PredBinding);
 
 GetOptions ("alleles=s" => \$alleles,    # allele
 	    "input=s"   => \$input,      # input file
 	    "dir=s"   => \$dir,      # current path
 	    "output=s"   => \$output_file,      # output directory
 	    "lib=s"   => \$lib_dir,      # lib dir
-	    "mix=s"   => \$MixMHCpred_dir)      # MixMHCpred package
+	    "mix=s"   => \$MixMHCpred_dir,      # MixMHCpred package
+	    "pred=s"   => \$PredBinding)      # Use NetMHCpan instead of MixMHCpred
     or die("Error in command line arguments\n");
 
 ##########
@@ -28,25 +29,29 @@ GetOptions ("alleles=s" => \$alleles,    # allele
 ##########
 
 my @allele_input=split(",", $alleles);
+
+
 my @allele_list=();
 my $h;
 my $nh=scalar @allele_input;
 
 foreach $h (@allele_input){
-    
-    if(substr($h, 0, 4) eq "HLA-"){
-	$h=substr($h, 4, length($h)-4);
+
+    my $th=$h;
+    #For human alleles, simplify the nomenclature
+    if(substr($th, 0, 4) eq "HLA-"){
+	$th=substr($th, 4, length($th)-4); # Remove the "HLA-"
     }
-    if(substr($h, 1, 1) eq "*"){
-	$h=substr($h, 0, 1).substr($h, 2, length($h)-2);
+    my $i=index($th, "*");
+    if($i>0){
+	$th=substr($th, 0, $i).substr($th, $i+1, length($th)); # Remove the "*"
     }
-    if(substr($h, 3, 1) eq ":"){
-	$h=substr($h, 0, 3).substr($h, 4, length($h)-3);
+    if( substr($th, 3, 1) eq ":" && length($th)==6 ){
+	$th=substr($th, 0, 3).substr($th, 4, length($th)-3); # Remove the ":"
     }
-    push @allele_list, $h;
+    push @allele_list, $th;
 }
 
-#print "@allele_list\n";
 
 ###########
 # Check input file
@@ -70,8 +75,6 @@ while($l=<IN>){
 close IN;
 
 if(scalar @peptide == 0){
-    #print "Empty peptide file\n";
-    #exit;
     die "Empty peptide file\n";
 }
 
@@ -108,51 +111,77 @@ foreach $p (@peptide){
 # Load information about the alleles
 #######################################
 
-
-my $t;
-my $cond=0;
-
-my %pres=();
-my %maph=();
-
-open IN, "$lib_dir/alleles_mapping.txt", or die;
-while($l=<IN>){
-    $l =~ s/\r?\n$//;
-    my @a=split(' ', $l);
-    $maph{$a[0]}=$a[1];
-}
-close IN;
-
-
-my @a=split("\/", $MixMHCpred_dir);
-my $path="";
-for(my $i=0; $i<(scalar @a)-1; $i++){
-    $path=$path."/".$a[$i];
-}
-
-
-open IN, "$lib_dir/alleles.txt", or die;
-while($l=<IN>){
-    $l =~ s/\r?\n$//;
-    chomp($l);
-    $pres{$l}=1;
-}
-close IN;
-my @b;
-
 my @allele_list_pred=();
-for(my $i=0; $i<$nh; $i++){
-    if(!exists $pres{$allele_list[$i]}){
-	#print "Predictions cannot be run for $allele_list[$i]\n";
-	die "Predictions cannot be run for $allele_list[$i]\n";
-	#exit;
-    } else{
-	$cond=1;
-	if(! exists $maph{$allele_list[$i]}){
-	    push @allele_list_pred, $allele_list[$i];
-	} else {
-	    push @allele_list_pred,$maph{$allele_list[$i]};
+
+if($PredBinding eq "MixMHCpred"){
+    
+    my $t;
+    my $cond=0;
+    
+    my %pres=();
+    my %maph=();
+    
+    open IN, "$lib_dir/alleles_mapping.txt", or die;
+    while($l=<IN>){
+	$l =~ s/\r?\n$//;
+	my @a=split(' ', $l);
+	$maph{$a[0]}=$a[1];
+    }
+    close IN;
+    
+    
+    my @a=split("\/", $MixMHCpred_dir);
+    my $path="";
+    for(my $i=0; $i<(scalar @a)-1; $i++){
+	$path=$path."/".$a[$i];
+    }
+        
+    open IN, "$lib_dir/alleles.txt", or die;
+    while($l=<IN>){
+	$l =~ s/\r?\n$//;
+	
+	$pres{$l}=1;
+    }
+    close IN;
+    my @b;
+    
+    
+    for(my $i=0; $i<$nh; $i++){
+	if(!exists $pres{$allele_list[$i]}){
+	    #print "Predictions cannot be run for $allele_list[$i]\n";
+	    die "Predictions cannot be run for $allele_list[$i]\n";
+	    #exit;
+	} else{
+	    $cond=1;
+	    if(! exists $maph{$allele_list[$i]}){
+		push @allele_list_pred, $allele_list[$i];
+	    } else {
+		push @allele_list_pred,$maph{$allele_list[$i]};
+	    }
 	}
+    }
+} elsif($PredBinding eq "NetMHCpan"){
+
+    my %pres=();
+    open IN, "$lib_dir/allelenames_NetMHCpan.txt", or die;
+     while($l=<IN>){
+	$l =~ s/\r?\n$//;
+	my @a=split(' ', $l);
+	$pres{$a[0]}=1;
+    }
+    close IN;
+    
+    foreach $h (@allele_list){
+	my $th="";
+	if(length($h)==5 && (substr($h, 0, 1) eq "A" || substr($h, 0, 1) eq "B" || substr($h, 0, 1) eq "C" || substr($h, 0, 1) eq "G" )){
+	    $th="HLA-".substr($h, 0, 3).":".substr($h, 3, 2);
+	} else {
+	    $th=$h;
+	}
+	if(!exists $pres{$th}){
+	    die "Predictions cannot be run for $th\n";
+	}
+	push @allele_list_pred, $h;	
     }
 }
 
@@ -164,33 +193,48 @@ my @coef=();
 open IN, "$lib_dir/coef.txt", or die;
 #open IN, "../../train/coef.txt", or die;
 while($l=<IN>){
-
+    
     chomp($l);
-    @a=split(' ', $l);
+    my @a=split(' ', $l);
     push @coef, $a[1];
     
 }
 
 
 ################################
-# Run the MixMHCpred predictions
+# Run the binding predictions
 ################################
 
 my $rd=int(rand(1000000));
 
-while(-e "../tmp/MixMHCpred_$rd.txt"){
-    print "fail\n"; 
-}
-
 
 #Run MixMHCpred
-my $th=$allele_list_pred[0];
-if(scalar @allele_list_pred > 1){
-    for(my $i=1; $i<scalar @allele_list_pred; $i++){
-	$th=$th.",".$allele_list_pred[$i];
+
+if($PredBinding eq "MixMHCpred"){
+
+    my $th=$allele_list_pred[0];
+    if(scalar @allele_list_pred > 1){
+	for(my $i=1; $i<scalar @allele_list_pred; $i++){
+	    $th=$th.",".$allele_list_pred[$i];
+	}
     }
+    system("$MixMHCpred_dir -i $input -o $lib_dir/../tmp/MixMHCpred_$rd.txt -a $th");
+    
+} elsif($PredBinding eq "NetMHCpan"){
+
+    my $th="";
+    for(my $i=0; $i<scalar @allele_list_pred; $i++){
+	$h=$allele_list_pred[$i];
+	if(length($h)==5 && (substr($h, 0, 1) eq "A" || substr($h, 0, 1) eq "B" || substr($h, 0, 1) eq "C" || substr($h, 0, 1) eq "E" || substr($h, 0, 1) eq "G" )){
+	    $th="HLA-".substr($h, 0, 3).":".substr($h, 3, 2);
+	} else {
+	    $th=$h;
+	}
+	#print "$h\t$th\n";
+	system("NetMHCpan -f $input -a $th -p >  $lib_dir/../tmp/NetMHCpan_$h\_$rd.txt");
+    }
+    
 }
-system("$MixMHCpred_dir -i $input -o $lib_dir/../tmp/MixMHCpred_$rd.txt -a $th");
 
 ###########################
 # Run the PRIME predictions
@@ -203,10 +247,13 @@ my $Npval;
 for(my $i=0; $i<scalar @allele_list_pred; $i++){
     
     $Npval=0;
-    open IN, "$lib_dir/PerRank/$allele_list_pred[$i].txt", or die;
-    while($l=<IN>){
+    if(-e "$lib_dir/PerRank/$allele_list_pred[$i].txt"){
+	open IN, "$lib_dir/PerRank/$allele_list_pred[$i].txt", or die;
+    } else {
+	open IN, "$lib_dir/PerRank/A0201.txt", or die; #WARNING: This has to be updated, but for now if the allele is not in the set of precomputed ones, we take A0201. This is the case if we use NetMHCpan with alleles not supported by MixMHCpred.
+    } while($l=<IN>){
 	chomp($l);
-	@a=split(' ', $l);
+	my @a=split(' ', $l);
 	$pval[$Npval]=$a[0];
 	$thresh[$i][$Npval]=$a[1];
 	$Npval++;
@@ -221,17 +268,23 @@ my $score=0;
 my $Pval;
 my @Pval_list=();
 my @score_list=();
-my @rank_list=();
 my @fr=();
 my @aa=();
 my @pos=();
-my $h;
-open IN, "$lib_dir/../tmp/MixMHCpred_$rd.txt";
+my $th=$allele_input[0];
+
+for(my $i=1; $i<scalar(@allele_input); $i++){
+    $th=$th.",".$allele_input[$i];
+}
+
+#print "$PredBinding\t@allele_input\t@allele_list\t@allele_list_pred\n";
+
+
 open OUT, ">$output_file";
 printf OUT "####################\n";
 printf OUT "# Output from PRIME (v1.0)\n";
 printf OUT "# Alleles: $th\n";
-printf OUT "#\n";
+printf OUT "# Affinity predictions: $PredBinding\n";
 printf OUT "# PRIME is freely available for academic users.\n";
 printf OUT "# Private companies should contact eauffarth\@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n";
 printf OUT "#\n";
@@ -241,33 +294,64 @@ printf OUT "#\n";
 printf OUT "####################\n";
 
 printf OUT "Peptide\t%%Rank_bestAllele\tScore_bestAllele\t%%RankBinding_bestAllele\tBestAllele";
-for(my $i=0; $i<scalar @allele_list; $i++){
-    printf OUT "\t%%Rank_$allele_list[$i]\tScore_$allele_list[$i]\t%%RankBinding_$allele_list[$i]";
+for(my $i=0; $i<scalar @allele_input; $i++){
+    printf OUT "\t%%Rank_$allele_input[$i]\tScore_$allele_input[$i]\t%%RankBinding_$allele_input[$i]";
 }
 print OUT "\n";
 
-for(my $i=0; $i<12; $i++){
-    $l=<IN>;
+my @pep;
+my @rank_list=([]);
+
+my $ct;
+
+if($PredBinding eq "MixMHCpred"){
+    open IN, "$lib_dir/../tmp/MixMHCpred_$rd.txt", or die;
+    for(my $i=0; $i<12; $i++){
+	$l=<IN>;
+    }
+    $ct=0;
+    while ($l=<IN>) {
+	chomp($l);
+	my @a=split(' ', $l);
+	push @pep, $a[0];
+	for (my $j=5; $j<scalar @a; $j=$j+2) {
+	    push @{$rank_list[$ct]}, $a[$j];
+	   
+	}
+	$ct++;
+    }
+    close IN;
+    
+} elsif ($PredBinding eq "NetMHCpan"){
+
+    for(my $i=0; $i<scalar @allele_list_pred; $i++){
+	$ct=0;
+	open IN, "$lib_dir/../tmp/NetMHCpan_$allele_list_pred[$i]_$rd.txt", or die;
+	for(my $j=0; $j<49; $j++){
+	    $l=<IN>;
+	}
+	while($l=<IN>){
+	    chomp($l);
+	    my @a=split(' ', $l);
+	    if($a[0]==1){
+		push @pep, $a[2];
+		$rank_list[$ct][$i] = $a[12];
+		$ct++;
+	    }
+	}
+	close IN;
+    }
+    
 }
 
-while ($l=<IN>) {
-
-    #if(substr($l, 0, 1) ne "#" && substr($l, 0, 7) ne "Peptide"){
-
-    chomp($l);
-    @a=split(' ', $l);
-    
-    my $t=0;
+for(my $n=0; $n<$ct; $n++){
+   
     @score_list=();
     @Pval_list=();
-    @rank_list=();
-    for (my $j=5; $j<scalar @a; $j=$j+2) {
+    for (my $j=0; $j<scalar @allele_list_pred; $j++) {
 	
-	$rank=-log($a[$j]);
-	#print "$a[$j]\t$rank\n";
-	push @rank_list, $a[$j];
-	$al_pred=$allele_list_pred[$t];
-	    
+	$al_pred=$allele_list_pred[$j];
+	
 	####
 	# Compute the PRIME score with each allele and the corresponding %Rank
 	####
@@ -275,9 +359,9 @@ while ($l=<IN>) {
 	for (my $i=0; $i<$N; $i++) {
 	    $fr[$i]=0;
 	}
-	@aa=split('', $a[0]);
-	@pos=find_pos($al_pred, length($a[0]));
-	   
+	@aa=split('', $pep[$n]);
+	@pos=find_pos($al_pred, length($pep[$n]));
+		
 	for (my $i=0; $i<$N; $i++) {
 	    $fr[$i]=0;
 	}
@@ -286,20 +370,20 @@ while ($l=<IN>) {
 	foreach $p (@pos) {
 	    $fr[$map{$aa[$p]}]=$fr[$map{$aa[$p]}]+1.0/$sc;
 	}
-	    
-	#print "@fr\t$rank\n";
+
+	
 	$score=$coef[0];
 	for (my $i=0; $i<$N; $i++) {
 	    $score=$score+$fr[$i]*$coef[$i+1];
 	}
-	$score=$score+$rank*$coef[$N+1];
+	$score=$score-log($rank_list[$n][$j])*$coef[$N+1];
 	$score=1/(1+exp(-$score));
 	    
 	push @score_list, $score;
 	    
 	#Compute the %Rank
 	my $k=0;
-	while ($score<$thresh[$t][$k] && $k<$Npval) {
+	while ($score<$thresh[$j][$k] && $k<$Npval) {
 	    $k++;
 	}
 
@@ -309,9 +393,11 @@ while ($l=<IN>) {
 	    $Pval=$pval[$k];
 	}
 	push @Pval_list, $Pval;
-	    
-	$t++;
+	#print "$pep[0]\t$score\t$Pval\n";
+	#die;
+	
     }
+    
     #######################
     #Find the lowest Pvalue (this will determine which is the predicted allele)
     #This means that we take the PRIME score with each allele, and then take the best allele based on %Rank, unlike MixMHCpred where the best score is used to take the predicted allele, and %Rank are computed for the combination of allele
@@ -323,29 +409,32 @@ while ($l=<IN>) {
 	if ($Pval_list[$i]<$min_Pval) {
 	    $min_Pval=$Pval_list[$i];
 	    $min_pos=$i;
-		    
 	}
     }
     
-    printf OUT "$a[0]\t%.2f\t%.6f\t%.2f\t$allele_list[$min_pos]",  $Pval_list[$min_pos], $score_list[$min_pos], $rank_list[$min_pos];
+    printf OUT "$pep[$n]\t%.2f\t%.6f\t%.2f\t$allele_input[$min_pos]",  $Pval_list[$min_pos], $score_list[$min_pos], $rank_list[$n][$min_pos];
     for (my $i=0; $i<scalar @Pval_list; $i++) {
-	printf OUT "\t%.2f\t%.6f\t%.2f", $Pval_list[$i], $score_list[$i], $rank_list[$i];
+	printf OUT "\t%.2f\t%.6f\t%.2f", $Pval_list[$i], $score_list[$i], $rank_list[$n][$i];
     }
     print OUT "\n";
-    #}
+
 }
+
 close IN;
 close OUT;
 
-#system("cp $lib_dir/../tmp/MixMHCpred_$rd.txt $output_dir/MixMHCpred.txt");
-system("rm $lib_dir/../tmp/MixMHCpred_$rd.txt");
+if($PredBinding eq "MixMHCpred"){
+   system("rm $lib_dir/../tmp/MixMHCpred_$rd.txt");
+} elsif($PredBinding eq "NetMHCpan"){
+   system("rm $lib_dir/../tmp/NetMHCpan_*_$rd.txt");
+}
 
 sub find_pos(){
 
     my $al_pred=$_[0];
     my @pos=();
     my $le=$_[1];
-    if($al_pred eq "B0801" || $al_pred eq "B1401" || $al_pred eq "B1402" || $al_pred eq  "B3701" || $al_pred eq "A6802"){  # 6
+    if($al_pred eq "B0801" || $al_pred eq "B1401" || $al_pred eq "B1402" || $al_pred eq  "B3701" || $al_pred eq "A6802" || $al_pred eq "H2-Dd" || $al_pred eq "H-2-Dd"){  # 6
 	push @pos, 3;
 	for(my $j=5; $j<$le-1; $j++){
 	    push @pos, $j;
