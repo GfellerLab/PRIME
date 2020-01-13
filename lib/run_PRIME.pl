@@ -67,7 +67,6 @@ my $s;
 open IN, "$input", or die "No input\n";
 while($l=<IN>){
     $l =~ s/\r?\n$//;
-    chomp($l);
     if(substr($l, 0, 1) ne ">" && $l ne ""){
 	push @peptide, $l;
     }
@@ -120,12 +119,15 @@ if($PredBinding eq "MixMHCpred"){
     
     my %pres=();
     my %maph=();
+
+    
     
     open IN, "$lib_dir/alleles_mapping.txt", or die;
     while($l=<IN>){
 	$l =~ s/\r?\n$//;
 	my @a=split(' ', $l);
 	$maph{$a[0]}=$a[1];
+	$pres{$a[0]}=1;
     }
     close IN;
     
@@ -139,7 +141,6 @@ if($PredBinding eq "MixMHCpred"){
     open IN, "$lib_dir/alleles.txt", or die;
     while($l=<IN>){
 	$l =~ s/\r?\n$//;
-	
 	$pres{$l}=1;
     }
     close IN;
@@ -194,7 +195,7 @@ open IN, "$lib_dir/coef.txt", or die;
 #open IN, "../../train/coef.txt", or die;
 while($l=<IN>){
     
-    chomp($l);
+    $l =~ s/\r?\n$//;
     my @a=split(' ', $l);
     push @coef, $a[1];
     
@@ -252,7 +253,7 @@ for(my $i=0; $i<scalar @allele_list_pred; $i++){
     } else {
 	open IN, "$lib_dir/PerRank/A0201.txt", or die; #WARNING: This has to be updated, but for now if the allele is not in the set of precomputed ones, we take A0201. This is the case if we use NetMHCpan with alleles not supported by MixMHCpred.
     } while($l=<IN>){
-	chomp($l);
+	$l =~ s/\r?\n$//;
 	my @a=split(' ', $l);
 	$pval[$Npval]=$a[0];
 	$thresh[$i][$Npval]=$a[1];
@@ -311,7 +312,7 @@ if($PredBinding eq "MixMHCpred"){
     }
     $ct=0;
     while ($l=<IN>) {
-	chomp($l);
+	$l =~ s/\r?\n$//;
 	my @a=split(' ', $l);
 	push @pep, $a[0];
 	for (my $j=5; $j<scalar @a; $j=$j+2) {
@@ -331,7 +332,7 @@ if($PredBinding eq "MixMHCpred"){
 	    $l=<IN>;
 	}
 	while($l=<IN>){
-	    chomp($l);
+	    $l =~ s/\r?\n$//;
 	    my @a=split(' ', $l);
 	    if($a[0]==1){
 		push @pep, $a[2];
