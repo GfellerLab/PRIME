@@ -25,8 +25,7 @@
 
 # Set the location here. This has to be manually done on your machine.
 # Make sure you are not using spaces or other special characters in your paths.
-lib_path="/Users/davidgfeller/Research/LICR/Research/Immunogenicity_pred/PRIME/PRIME1.0/lib"
-#lib_path="/app/PRIME/lib" #This is important for the github, and needs to be manually changed
+lib_path="/app/PRIME/lib" #This is important for the github, and needs to be manually changed
 
 
 usage="Usage:PRIME -i INPUT -a ALLELES -o OUTPUT "
@@ -92,6 +91,11 @@ if [[ "$output_file" =~ " " ]]; then
     exit 1;
 fi
 
+if [[ "$output_file" == "" ]]; then
+    echo Problem with output file - likely missing directory
+    exit 1;
+fi
+
 #Check if MixMHCpred is available
 if [ ! -n "$MixMHCpred" ]; then
     
@@ -121,6 +125,7 @@ then
 	exit 1;
     fi
 fi
+
 
 perl $lib_path/run_PRIME.pl --alleles $alleles --input $input --dir $dir --output $output_file --lib $lib_path --mix $MixMHCpred --pred $PredBinding
 
