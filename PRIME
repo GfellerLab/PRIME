@@ -15,7 +15,7 @@
 # To do so, please contact eauffarth@licr.org at the Ludwig Institute for  Cancer Research Ltd.
 #
 # If you use PRIME1.0 in a publication, please cite:
-# Schmidt et al, The immunogenicity scale of amino acids (2019).
+# Schmidt et al. Prediction of neo-epitopes’ immunogenicity reveals TCR recognition determinants and immunoediting mechanisms, BioRxiv (2020).
 #
 # For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
 
@@ -43,13 +43,13 @@ cat <<END
 $usage
 Mandatory parameters:
   -i, --input             Absolute or relative path to the input file (fasta format or list of peptides)
-  -o, --output            Specify a directory for the output
+  -o, --output            Specify a file for the output
   -a, --allele            List of alleles to be considered, separated by comma (A0101,A0201,B0801)
 
 Optional parameters:
-  -mix, --MixMHCpred      Path to MixMHCpred
+  -mix, --MixMHCpred      Path of the MixMHCpred executable file (v2.0.2 or above)
   -pred, --PredBinding    if NetMHCpan, use NetMHCpan instead of MixMHCpred for affinity predicitions (default: MixMHCpred). NetMHCpan is required for non-human MHC alleles
-
+  -thr, --AffinityThreshod    Use a threshold on affinity values (%rank) (default: 5)
 END
 	exit 0;
 fi
@@ -61,6 +61,7 @@ while [ $# -gt 0 ]; do
 	    -o | --output) output_file=$2; shift 2;;
 	    -a | --allele) alleles=$2; shift 2;;
 	    -mix | --MixMHCpred) MixMHCpred=$2; shift 2;;
+	    -thr | --AffinityThreshold) AffinityThreshold=$2; shift 2;;
 	    -pred | --PredBinding) PredBinding=$2; shift 2;;
 	    *) shift 1;;
 	esac
@@ -101,7 +102,7 @@ if [ ! -n "$MixMHCpred" ]; then
     
     MixMHCpred=`which MixMHCpred`;
     if [ ! -n "$MixMHCpred" ]; then
-	echo "MixMHCpred not in your path. Please manually enter the path to MixMHCpred in the input line as '-mix MIXMHCPRED_PATH' (version 2.0.2).";
+	echo "MixMHCpred not in your path. Please manually enter the path to MixMHCpred in the input line as '-mix MIXMHCPRED_PATH' (version 2.0.2 or above).";
 	exit 1;
     fi
 fi
@@ -115,6 +116,12 @@ then
     exit 1
 fi
 
+if [ ! -n "$AffinityThreshold" ]; then
+    AffinityThreshold=5
+fi
+
+NetMHCpan_path="EMPTY"
+
 if [ "$PredBinding" == "NetMHCpan" ]
 then
     NetMHCpan_path=`which NetMHCpan`;
@@ -126,6 +133,5 @@ then
     fi
 fi
 
-
-perl $lib_path/run_PRIME.pl --alleles $alleles --input $input --dir $dir --output $output_file --lib $lib_path --mix $MixMHCpred --pred $PredBinding
+perl $lib_path/run_PRIME.pl --alleles $alleles --input $input --dir $dir --output $output_file --lib $lib_path --mix $MixMHCpred --pred $PredBinding --thr $AffinityThreshold --net $NetMHCpan_path
 

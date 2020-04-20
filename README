@@ -51,25 +51,26 @@ RUNNING
 Command:
 PRIME -i input_file -o output_dir -a allele1,allele2
 
-input_file:
+-i input_file:
 File listing all the peptides. Ideally a fasta file, but text files
 are supported and lines starting with ">" are skipped.
 All peptides should between 8 and 14-mers.
 
-allele:
+-a allele:
 HLA-I allele. Use the simple nomenclature like A0101.
 A01:01, A*01:01 or HLA-A*01:01 are also supported, but not
 recommanded. If you want to make predictions with multiple
 alleles, list the different alleles separated by a single comma ","
 (e.g. -a A0101,A2501,B0801,B1801).
 
-output_file:
+-o output_file:
 The name of the output file.
 
-Parameters:
+Optional parameters:
 
--mix: Give the path to MixMHCpred. Version 2.0.2 or above is required
+-mix: Give the path of MixMHCpred executable. Version 2.0.2 or above is required
 -predBinding: Decide whether to use MixMHCpred or NetMHCpan (default is MixMHCpred). Importantly, PRIME was trained using MixMHCpred. Although the %rank of NetMHCpan are quite similar to those of MixMHCpred and span the sam range of values, PRIME predictions may be less accurate when using NetMHCpan. Using NetMHCpan also implies that NetMHCpan4.0 is installed in your computer and available in your path. NetMHCpan is required for predictions in non-human MHC alleles.
+-thr: Threshold on %rank affinity (all peptides with %rank higher or equal to the threshold a given a score of 0 in PRIME) (default is 5)
 
 ########
 Output

@@ -13,7 +13,7 @@ use strict;
 use Getopt::Long;
 
 
-my ($alleles, $input, $dir, $output_file, $lib_dir, $MixMHCpred_dir, $PredBinding);
+my ($alleles, $input, $dir, $output_file, $lib_dir, $MixMHCpred_dir, $PredBinding, $NetMHCpan_dir, $affinity_threshold);
 
 GetOptions ("alleles=s" => \$alleles,    # allele
 	    "input=s"   => \$input,      # input file
@@ -21,6 +21,8 @@ GetOptions ("alleles=s" => \$alleles,    # allele
 	    "output=s"   => \$output_file,      # output directory
 	    "lib=s"   => \$lib_dir,      # lib dir
 	    "mix=s"   => \$MixMHCpred_dir,      # MixMHCpred package
+	    "net=s"   => \$NetMHCpan_dir,      # NetMHCpan package
+	    "thr=s"   => \$affinity_threshold,      # Threshodl on affinity
 	    "pred=s"   => \$PredBinding)      # Use NetMHCpan instead of MixMHCpred
     or die("Error in command line arguments\n");
 
@@ -112,60 +114,42 @@ foreach $p (@peptide){
 
 my @allele_list_pred=();
 
-if($PredBinding eq "MixMHCpred"){
-    
-    my $t;
-    my $cond=0;
-    
-    my %pres=();
-    my %maph=();
+my %pres=();
+my %maph=();
 
-    
-    
-    open IN, "$lib_dir/alleles_mapping.txt", or die;
-    while($l=<IN>){
-	$l =~ s/\r?\n$//;
-	my @a=split(' ', $l);
-	$maph{$a[0]}=$a[1];
-	$pres{$a[0]}=1;
-    }
-    close IN;
-    
-    
-    my @a=split("\/", $MixMHCpred_dir);
-    my $path="";
-    for(my $i=0; $i<(scalar @a)-1; $i++){
-	$path=$path."/".$a[$i];
-    }
-        
-    open IN, "$lib_dir/alleles.txt", or die;
-    while($l=<IN>){
-	$l =~ s/\r?\n$//;
-	$pres{$l}=1;
-    }
-    close IN;
-    my @b;
-    
+open IN, "$lib_dir/alleles_mapping.txt", or die;
+while($l=<IN>){
+    $l =~ s/\r?\n$//;
+    my @a=split(' ', $l);
+    $maph{$a[0]}=$a[1];
+    $pres{$a[0]}=1;
+}
+close IN;
+
+
+open IN, "$lib_dir/alleles.txt", or die;
+while($l=<IN>){
+    $l =~ s/\r?\n$//;
+    $maph{$l}=$l;
+    $pres{$l}=1;
+}
+close IN;
+
+if($PredBinding eq "MixMHCpred"){
     
     for(my $i=0; $i<$nh; $i++){
 	if(!exists $pres{$allele_list[$i]}){
-	    #print "Predictions cannot be run for $allele_list[$i]\n";
 	    die "Predictions cannot be run for $allele_list[$i]\n";
-	    #exit;
 	} else{
-	    $cond=1;
-	    if(! exists $maph{$allele_list[$i]}){
-		push @allele_list_pred, $allele_list[$i];
-	    } else {
-		push @allele_list_pred,$maph{$allele_list[$i]};
-	    }
+	    push @allele_list_pred,$maph{$allele_list[$i]};
+	    
 	}
     }
 } elsif($PredBinding eq "NetMHCpan"){
-
+    
     my %pres=();
     open IN, "$lib_dir/allelenames_NetMHCpan.txt", or die;
-     while($l=<IN>){
+    while($l=<IN>){
 	$l =~ s/\r?\n$//;
 	my @a=split(' ', $l);
 	$pres{$a[0]}=1;
@@ -186,13 +170,13 @@ if($PredBinding eq "MixMHCpred"){
     }
 }
 
+
 #######################################
 # Load the coefficients of the logistic regression
 #######################################
 
 my @coef=();
 open IN, "$lib_dir/coef.txt", or die;
-#open IN, "../../train/coef.txt", or die;
 while($l=<IN>){
     
     $l =~ s/\r?\n$//;
@@ -232,9 +216,8 @@ if($PredBinding eq "MixMHCpred"){
 	    $th=$h;
 	}
 	#print "$h\t$th\n";
-	system("NetMHCpan -f $input -a $th -p >  $lib_dir/../tmp/NetMHCpan_$h\_$rd.txt");
+	system("NetMHCpan -f $input -a $th -p -BA >  $lib_dir/../tmp/NetMHCpan_$h\_$rd.txt");
     }
-    
 }
 
 ###########################
@@ -250,8 +233,10 @@ for(my $i=0; $i<scalar @allele_list_pred; $i++){
     $Npval=0;
     if(-e "$lib_dir/PerRank/$allele_list_pred[$i].txt"){
 	open IN, "$lib_dir/PerRank/$allele_list_pred[$i].txt", or die;
+    } elsif (-e "$lib_dir/PerRank/$maph{$allele_list_pred[$i]}.txt") {
+	open IN, "$lib_dir/PerRank/$maph{$allele_list_pred[$i]}.txt", or die; # This is the case if we use NetMHCpan with alleles not in pre-computed
     } else {
-	open IN, "$lib_dir/PerRank/A0201.txt", or die; #WARNING: This has to be updated, but for now if the allele is not in the set of precomputed ones, we take A0201. This is the case if we use NetMHCpan with alleles not supported by MixMHCpred.
+	open IN, "$lib_dir/PerRank/A0201.txt", or die; # This is the case when using NetMHCpan with alleles that cannot be mapped to any of the precomputed ones.
     } while($l=<IN>){
 	$l =~ s/\r?\n$//;
 	my @a=split(' ', $l);
@@ -285,12 +270,17 @@ open OUT, ">$output_file";
 printf OUT "####################\n";
 printf OUT "# Output from PRIME (v1.0)\n";
 printf OUT "# Alleles: $th\n";
-printf OUT "# Affinity predictions: $PredBinding\n";
+printf OUT "# Affinity predictions: $PredBinding";
+if($PredBinding eq "MixMHCpred"){
+    print OUT " ($MixMHCpred_dir)\n";
+} else {
+    print OUT " ($NetMHCpan_dir)\n";
+}
 printf OUT "# PRIME is freely available for academic users.\n";
 printf OUT "# Private companies should contact eauffarth\@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n";
 printf OUT "#\n";
 printf OUT "# To cite PRIME, please refer to:\n";
-printf OUT "# The immunogenicity scale of amino acids. xxx (2019)\n";
+printf OUT "# Schmidt et al. Prediction of neo-epitopes’ immunogenicity reveals TCR recognition determinants and immunoediting mechanisms, BioRxiv (2020).\n";
 printf OUT "#\n";
 printf OUT "####################\n";
 
@@ -324,61 +314,78 @@ if($PredBinding eq "MixMHCpred"){
     close IN;
     
 } elsif ($PredBinding eq "NetMHCpan"){
-
+    
     for(my $i=0; $i<scalar @allele_list_pred; $i++){
 	$ct=0;
+	my $pos_rank;
 	open IN, "$lib_dir/../tmp/NetMHCpan_$allele_list_pred[$i]_$rd.txt", or die;
-	for(my $j=0; $j<49; $j++){
-	    $l=<IN>;
-	}
 	while($l=<IN>){
 	    $l =~ s/\r?\n$//;
 	    my @a=split(' ', $l);
+	    if($a[0] eq "Pos"){
+		for(my $j=0; $j<scalar (@a); $j++){
+		    if($a[$j] eq "%Rank"){
+			$pos_rank=$j;
+		    }
+		}
+	    }
 	    if($a[0]==1){
 		push @pep, $a[2];
-		$rank_list[$ct][$i] = $a[12];
+		$rank_list[$ct][$i] = $a[$pos_rank];
 		$ct++;
 	    }
 	}
 	close IN;
+    }   
+}
+
+#Precompute the positions for each allele and each length
+my @pos_all=([[]]);
+for (my $j=0; $j<scalar @allele_list_pred; $j++) {
+    for(my $n=$Lmin; $n<=$Lmax; $n++){
+	@{$pos_all[$j][$n]}=find_pos($allele_list_pred[$j], $n);
     }
-    
 }
 
 for(my $n=0; $n<$ct; $n++){
    
     @score_list=();
     @Pval_list=();
+    my $lg=length($pep[$n]);
     for (my $j=0; $j<scalar @allele_list_pred; $j++) {
 	
-	$al_pred=$allele_list_pred[$j];
-	
-	####
-	# Compute the PRIME score with each allele and the corresponding %Rank
-	####
+	if($rank_list[$n][$j] <= $affinity_threshold){
+	    $al_pred=$allele_list_pred[$j];
 	    
-	for (my $i=0; $i<$N; $i++) {
-	    $fr[$i]=0;
+	    ####
+	    # Compute the PRIME score with each allele and the corresponding %Rank
+	    ####
+	    
+	    for (my $i=0; $i<$N; $i++) {
+		$fr[$i]=0;
+	    }
+	    @aa=split('', $pep[$n]);
+	    @pos=@{$pos_all[$j][$lg]};
+	    
+	    for (my $i=0; $i<$N; $i++) {
+		$fr[$i]=0;
+	    }
+	    
+	    my $sc=(scalar @pos);
+	    foreach $p (@pos) {
+		$fr[$map{$aa[$p]}]=$fr[$map{$aa[$p]}]+1.0/$sc;
+	    }
+	    
+	        
+	    $score=$coef[0];
+	    for (my $i=0; $i<$N; $i++) {
+		$score=$score+$fr[$i]*$coef[$i+1];
+	    }
+	    $score=$score-log($rank_list[$n][$j])*$coef[$N+1];
+	    $score=1/(1+exp(-$score));
+	} else {
+	    $score=0;
 	}
-	@aa=split('', $pep[$n]);
-	@pos=find_pos($al_pred, length($pep[$n]));
-		
-	for (my $i=0; $i<$N; $i++) {
-	    $fr[$i]=0;
-	}
-
-	my $sc=(scalar @pos);
-	foreach $p (@pos) {
-	    $fr[$map{$aa[$p]}]=$fr[$map{$aa[$p]}]+1.0/$sc;
-	}
-
-	
-	$score=$coef[0];
-	for (my $i=0; $i<$N; $i++) {
-	    $score=$score+$fr[$i]*$coef[$i+1];
-	}
-	$score=$score-log($rank_list[$n][$j])*$coef[$N+1];
-	$score=1/(1+exp(-$score));
 	    
 	push @score_list, $score;
 	    
@@ -435,7 +442,7 @@ sub find_pos(){
     my $al_pred=$_[0];
     my @pos=();
     my $le=$_[1];
-    if($al_pred eq "B0801" || $al_pred eq "B1401" || $al_pred eq "B1402" || $al_pred eq  "B3701" || $al_pred eq "A6802" || $al_pred eq "H2-Dd" || $al_pred eq "H-2-Dd"){  # 6
+    if($al_pred eq "B0801" || $al_pred eq "B1401" || $al_pred eq "B1402" || $al_pred eq  "B3701" || $al_pred eq "A6802" || $al_pred eq "H2-Dd" || $al_pred eq "H-2-Dd" || $al_pred eq "H2-Db" || $al_pred eq "H-2-Db" || $al_pred eq "H2-Kb" || $al_pred eq "H-2-Kb"){  # 6
 	push @pos, 3;
 	for(my $j=5; $j<$le-1; $j++){
 	    push @pos, $j;
