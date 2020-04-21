@@ -127,14 +127,6 @@ while($l=<IN>){
 close IN;
 
 
-open IN, "$lib_dir/alleles.txt", or die;
-while($l=<IN>){
-    $l =~ s/\r?\n$//;
-    $maph{$l}=$l;
-    $pres{$l}=1;
-}
-close IN;
-
 if($PredBinding eq "MixMHCpred"){
     
     for(my $i=0; $i<$nh; $i++){
