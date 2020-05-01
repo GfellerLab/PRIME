@@ -272,7 +272,7 @@ printf OUT "# PRIME is freely available for academic users.\n";
 printf OUT "# Private companies should contact eauffarth\@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n";
 printf OUT "#\n";
 printf OUT "# To cite PRIME, please refer to:\n";
-printf OUT "# Schmidt et al. Prediction of neo-epitopes’ immunogenicity reveals TCR recognition determinants and immunoediting mechanisms, BioRxiv (2020).\n";
+printf OUT "# Schmidt et al. Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and immunoediting in human cancer, BioRxiv (2020).\n";
 printf OUT "#\n";
 printf OUT "####################\n";
 
