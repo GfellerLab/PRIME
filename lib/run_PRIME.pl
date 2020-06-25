@@ -176,6 +176,7 @@ while($l=<IN>){
     push @coef, $a[1];
     
 }
+close IN;
 
 
 ################################
@@ -316,7 +317,7 @@ if($PredBinding eq "MixMHCpred"){
 	    my @a=split(' ', $l);
 	    if($a[0] eq "Pos"){
 		for(my $j=0; $j<scalar (@a); $j++){
-		    if($a[$j] eq "%Rank"){
+		    if($a[$j] eq "%Rank_BA"){
 			$pos_rank=$j;
 		    }
 		}

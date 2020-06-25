@@ -25,7 +25,8 @@
 
 # Set the location here. This has to be manually done on your machine.
 # Make sure you are not using spaces or other special characters in your paths.
-lib_path="/app/PRIME/lib" #This is important for the github, and needs to be manually changed
+lib_path="/Users/davidgfeller/Research/LICR/Research/Immunogenicity_pred/PRIME1.0/PRIME1.0/lib"
+#lib_path="/app/PRIME/lib" #This is important for the github, and needs to be manually changed
 
 
 usage="Usage:PRIME -i INPUT -a ALLELES -o OUTPUT "
@@ -126,9 +127,9 @@ if [ "$PredBinding" == "NetMHCpan" ]
 then
     NetMHCpan_path=`which NetMHCpan`;
     #echo $NetMHCpan_path
-    if [[ $NetMHCpan_path != *"netMHCpan-4.0"* ]]
+    if [[ $NetMHCpan_path != *"netMHCpan-4"* ]]
     then
-	echo "NetMHCpan4.0 is not installed or not in your path"
+	echo "NetMHCpan4.0 or above is not installed or not in your path"
 	exit 1;
     fi
 fi
