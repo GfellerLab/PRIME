@@ -1,6 +1,6 @@
 
 ###############
-# PRIME is a PRedictor of class I IMmunogenic Epitopes. It combines predictions of binding to HLA molecules and propensity of amino acids for immunogenicity.
+# PRIME is a PRedictor of class I IMmunogenic Epitopes. It combines predictions of binding to HLA molecules and propensity for TCR recogntion.
 #
 # PRIME1.0 can be used freely by academic groups for non-commercial purposes (see license).
 # The product is provided free of charge, and, therefore, on an "as is"
