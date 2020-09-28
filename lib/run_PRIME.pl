@@ -6,7 +6,7 @@
 
 # For any question or commercial use, please ask david.gfeller@unil.ch.
 
-# Copyright (2019) David Gfeller.
+# Copyright (2020) David Gfeller.
 ################
 
 use strict;
