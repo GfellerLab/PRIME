@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ###############
-# PRIME1.0 is a predictor of HLA ligand displayed at the cell surface.
+# PRIME1.0 is a predictor of immunogenicity for class I epitopes
 #
 # PRIME requires MixMHCpred (version 2.0.2 or above) to be installed on your computer.
 #
