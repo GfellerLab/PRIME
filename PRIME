@@ -3,7 +3,7 @@
 ###############
 # PRIME1.0 is a predictor of immunogenicity for class I epitopes
 #
-# PRIME requires MixMHCpred (version 2.0.2 or above) to be installed on your computer.
+# PRIME requires MixMHCpred (version 2.1 or above) to be installed on your computer.
 #
 # PRIME1.0 can be used freely by academic groups for non-commercial purposes (see license).
 # The product is provided free of charge, and, therefore, on an "as is"
@@ -15,7 +15,7 @@
 # To do so, please contact eauffarth@licr.org at the Ludwig Institute for  Cancer Research Ltd.
 #
 # If you use PRIME1.0 in a publication, please cite:
-# Schmidt et al., Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. (2020).
+# Schmidt et al., Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. Cell reports Medicine, 2021.
 #
 # For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
 #
@@ -25,6 +25,7 @@
 
 # Set the location here. This has to be manually done on your machine.
 # Make sure you are not using spaces or other special characters in your paths.
+#lib_path="/Users/davidgfeller/Research/LICR/Research/Immunogenicity_pred/PRIME1.0/PRIME1.0/lib"
 lib_path="/app/PRIME/lib"
 
 
