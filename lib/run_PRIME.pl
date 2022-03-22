@@ -170,7 +170,7 @@ if(scalar @allele_list_pred > 1){
 	$th=$th.",".$allele_list_pred[$i];
     }
 }
-system("$MixMHCpred_dir -i $input -o $lib_dir/../tmp/MixMHCpred_$rd.txt -a $th");
+system("$MixMHCpred_dir -i $input -o $lib_dir/../temp/MixMHCpred_$rd.txt -a $th");
 
 ###########
 # Run PRIME
@@ -196,4 +196,4 @@ system("$lib_dir/PRIME.x $lib_dir $rd $nh $Np $all_list $all_list_pred $output_f
 if(! -e $output_file){
     print "PRIME failed...\n";
 }
-system("rm $lib_dir/../tmp/MixMHCpred_$rd.txt");
+system("rm $lib_dir/../temp/MixMHCpred_$rd.txt");
