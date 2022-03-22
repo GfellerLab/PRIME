@@ -100,7 +100,7 @@ int main(int argc, char ** argv){
     
 
 
-    sprintf(filename, "%s/../tmp/MixMHCpred_%d.txt", lib_dir, rd);
+    sprintf(filename, "%s/../temp/MixMHCpred_%d.txt", lib_dir, rd);
     
     file.open(filename);
     for(int i=0; i<12; i++){
@@ -274,7 +274,7 @@ int main(int argc, char ** argv){
     fprintf (pFile, "# PRIME is freely available for academic users.\n");
     fprintf (pFile, "# Private companies should contact eauffarth@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n");
     fprintf (pFile, "# To cite PRIME2.0, please refer to:\n");
-    fprintf (pFile, "# Gfeller et al. Improved predicitons of immunogenicity reveal SARS-COV2 CD8 T-cell epitopes, BioRxiv (2022).\n");
+    fprintf (pFile, "# Gfeller et al. Improved predictions of immunogenicity reveal SARS-COV2 CD8 T-cell epitopes, BioRxiv (2022).\n");
     fprintf (pFile, "####################\n");
 
     fprintf (pFile, "Peptide\t\%%Rank_bestAllele\tScore_bestAllele\t\%%RankBinding_bestAllele\tBestAllele");
