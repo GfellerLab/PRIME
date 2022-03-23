@@ -28,7 +28,7 @@ NEW FEATURES OF VERSION 2.0
 
 - Use of neural networks
 - Expanded training set of neo-antigens
-- Improved calculation of %ranks
+- Improved calculation of %Ranks
 
 
 ############
@@ -47,13 +47,20 @@ path to the PRIME2.0/lib directory where you have installed the script
 
 4) To run it from anywhere on your computer, add the PRIME2.0 directory to your path.
 
-5) PRIME requires MixMHCpred v2.2 or above to be installed on your computer (https://github.com/GfellerLab/MixMHCpred) and be in your PATH (if not in your PATH, you can use the '-mix PATH_TO_MIXMHCPRED' command line option).
+5) PRIME requires MixMHCpred v2.2 or above to be installed on your computer (https://github.com/GfellerLab/MixMHCpred) and be in your PATH (if not in your PATH, you can use the '-mix PATH_OF_MIXMHCPRED_EXEC' command line option).
 
 6) To test your installation, make sure you are in the PRIME2.0/ directory and run the command (should not take more than a few seconds):
 
    ./PRIME -i test/test.txt -o test/out.txt -a A0201,A0101
 
 Apart from specific paths, the output file test/out.txt should be the same as test/out_compare.txt
+
+For Linux:
+
+After step 3), you also need to compile the PRIME.cc code. Go to
+PRIME2.0/lib and compile with your favorite C++ compiler
+(e.g. g++ -O3 PRIME.cc -o PRIME.x)
+
 
 
 ########
@@ -66,7 +73,7 @@ PRIME -i input_file -o output_dir -a allele1,allele2
 -i input_file:
 File listing all the peptides. Ideally a text file, but fasta files
 are supported and lines starting with ">" are skipped. Do NOT use filenames with special characters like '*' (e.g., "HLA-A*02:01.txt").
-All peptides should between 8 and 14-mers. Depending on your memory, you may have issues if the number of peptides is too large (e.g., > 1'000'000).
+All peptides should be of length 8 to 14. Depending on your memory, you may have issues if the number of peptides is too large (e.g., > 1'000'000).
 
 -a allele:
 List of HLA-I alleles. Use the simple nomenclature like A0101.
@@ -90,7 +97,7 @@ Output file:
 Column 1: Peptide sequence
 Column 2: Lowest %Rank for PRIME score across the different alleles
 Column 3: PRIME Score corresponding to allele with the lowest %Rank
-Column 4: Predicted binding score (MixMHCpred %Rank)
+Column 4: Predicted binding score (i.e., MixMHCpred %Rank)
 Column 5: Best allele (based on the lowest PRIME %Rank).
 Additional columns: %Rank, scores and MixMHCpred %Rank for each allele.
 
