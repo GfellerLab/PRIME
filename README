@@ -55,6 +55,10 @@ path to the PRIME2.0/lib directory where you have installed the script
 
 Apart from specific paths, the output file test/out.txt should be the same as test/out_compare.txt
 
+For Mac:
+
+Depending on your security setup, you may have to manually allow PRIME executable to run (Systems Preferences -> Security & Privacy -> General)
+
 For Linux:
 
 After step 3), you also need to compile the PRIME.cc code. Go to
