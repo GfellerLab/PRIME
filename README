@@ -1,23 +1,35 @@
 
 ###############
-# PRIME is a PRedictor of class I IMmunogenic Epitopes. It combines predictions of binding to HLA molecules and propensity for TCR recogntion.
+# PRIME is a PRedictor of class I IMmunogenic Epitopes. It combines predictions of binding to HLA-I molecules and propensity for TCR recognition.
 #
-# PRIME1.0 can be used freely by academic groups for non-commercial purposes (see license).
+# PRIME2.0 can be used freely by academic groups for non-commercial purposes (see license).
 # The product is provided free of charge, and, therefore, on an "as is"
 #  basis, without warranty of any kind.
 #
 # FOR-PROFIT USERS
-# If you plan to use PRIME (version 1.0) or any data provided with the script in any for-profit
-# application, you are required to obtain a separate  license.
-# To do so, please contact eauffarth@licr.org at the Ludwig Institute for  Cancer Research Ltd.
+# If you plan to use PRIME (version 2.0) or any data provided with the script in any for-profit
+# application, you are required to obtain a separate license.
+# To do so, please contact eauffarth@licr.org at the Ludwig Institute for Cancer Research Ltd.
 #
-# If you use PRIME1.0 in a publication, please cite:
-# Schmidt et al., Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. (2020).
+# If you use PRIME2.0 in a publication, please cite:
+# Schmidt et al., Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. Cell Reports Medicine (2021).
+# and
+# Gfeller et al. Improved predictions of immunogenicity reveal SARS-Cov-2 CD8 T-cell epitopes, BioRxiv (2022)
 #
 # For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
 #
-# Copyright (2020) David Gfeller
+# Copyright (2021) David Gfeller
 ###############
+
+
+########################
+NEW FEATURES OF VERSION 2.0
+########################
+
+- Use of neural networks
+- Expanded training set of neo-antigens
+- Improved calculation of %Ranks
+
 
 ############
 INSTALLATION
@@ -25,23 +37,34 @@ INSTALLATION
 
 For Mac and Linux:
 
-1) Dowload the PRIME1.0.zip file and move it to a directory
+1) Download the PRIME2.0.zip file and move it to a directory
 of your choice, where you have writing permissions.
 
-2) Unzip the PRIME1.0.zip package.
+2) Unzip the PRIME2.0.zip package.
 
 3) Open the PRIME file and replace lib_path by the
-path to the PRIME1.0/lib directory where you have installed the script
+path to the PRIME2.0/lib directory where you have installed the script
 
-4) To run it from anywhere on your computer, add the PRIME1.0 directory to your path.
+4) To run it from anywhere on your computer, add the PRIME2.0 directory to your path.
 
-5) PRIME requires MixMHCpred v2.0.2 or above to be installed on your computer (https://github.com/GfellerLab/MixMHCpred) and be in your PATH (if not in your PATH, you can use the '-mix PATH_TO_MIXMHCPRED' command line option).
+5) PRIME requires MixMHCpred v2.2 or above to be installed on your computer (https://github.com/GfellerLab/MixMHCpred) and be in your PATH (if not in your PATH, you can use the '-mix PATH_OF_MIXMHCPRED_EXEC' command line option).
 
-6) To test your installation, make sure you are in the PRIME1.0/ directory and run the command (should not take more than a few seconds):
+6) To test your installation, make sure you are in the PRIME2.0/ directory and run the command (should not take more than a few seconds):
 
    ./PRIME -i test/test.txt -o test/out.txt -a A0201,A0101
 
-The output file test/out.txt should be exatly the same as test/out_compare.txt
+Apart from specific paths, the output file test/out.txt should be the same as test/out_compare.txt
+
+For Mac:
+
+Depending on your security setup, you may have to manually allow PRIME executable to run (Systems Preferences -> Security & Privacy -> General)
+
+For Linux:
+
+After step 3), you also need to compile the PRIME.cc code. Go to
+PRIME2.0/lib and compile with your favorite C++ compiler
+(e.g. g++ -O3 PRIME.cc -o PRIME.x)
+
 
 
 ########
@@ -52,36 +75,34 @@ Command:
 PRIME -i input_file -o output_dir -a allele1,allele2
 
 -i input_file:
-File listing all the peptides. Ideally a fasta file, but text files
-are supported and lines starting with ">" are skipped.
-All peptides should between 8 and 14-mers.
+File listing all the peptides. Ideally a text file, but fasta files
+are supported and lines starting with ">" are skipped. Do NOT use filenames with special characters like '*' (e.g., "HLA-A*02:01.txt").
+All peptides should be of length 8 to 14. Depending on your memory, you may have issues if the number of peptides is too large (e.g., > 1'000'000).
 
 -a allele:
-HLA-I allele. Use the simple nomenclature like A0101.
-A01:01, A*01:01 or HLA-A*01:01 are also supported, but not
-recommanded. If you want to make predictions with multiple
+List of HLA-I alleles. Use the simple nomenclature like A0101.
+A01:01, HLA-A01:01 or HLA-A*01:01 are also supported, but not
+recommended. If you want to make predictions with multiple
 alleles, list the different alleles separated by a single comma ","
 (e.g. -a A0101,A2501,B0801,B1801).
 
 -o output_file:
-The name of the output file.
+The name of the output file. Do NOT use filenames with special characters like '*' or '\' (e.g., "HLA-A*02:01.txt").
 
 Optional parameters:
 
--mix: Give the path of MixMHCpred executable. Version 2.0.2 or above is required
--predBinding: Decide whether to use MixMHCpred or NetMHCpan (default is MixMHCpred). Importantly, PRIME was trained using MixMHCpred. Although the %rank of NetMHCpan are quite similar to those of MixMHCpred and span the same range of values, PRIME predictions may be less accurate when using NetMHCpan. Using NetMHCpan also implies that NetMHCpan4.0 is installed in your computer and available in your path. NetMHCpan is required for predictions in non-human MHC alleles.
--thr: Threshold on %rank affinity (all peptides with %rank higher or equal to the threshold a given a score of 0 in PRIME) (default is 5).
+-mix: Give the full path of MixMHCpred executable (required if MixMHCpred is not in your PATH). Version 2.2 of MixMHCpred or above is required.
 
 ########
 Output
 ########
 
-PRIME.txt provides the output of the immunogenicity predictions.
+Output file:
 Column 1: Peptide sequence
 Column 2: Lowest %Rank for PRIME score across the different alleles
-Column 3: PRIME Score corresponding to alleles with the lowest %Rank
-Column 4: Predicted binding score (MixMHCpred %Rank)
-Column 5: Best allele
+Column 3: PRIME Score corresponding to allele with the lowest %Rank
+Column 4: Predicted binding score (i.e., MixMHCpred %Rank)
+Column 5: Best allele (based on the lowest PRIME %Rank).
 Additional columns: %Rank, scores and MixMHCpred %Rank for each allele.
 
-As in NetMHCpan, %Rank (Column 2) indicates the percentile of randomly generated peptides that would have a score higher or equal.
+The %Rank indicates the fraction of random peptides from the human proteome (length 8 to 14) that would have a score higher or equal to the peptide given in input. The %Rank should be used to rank peptides for experimental validation.
