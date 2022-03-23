@@ -35,7 +35,7 @@ int main(int argc, char ** argv){
     int N=20;
     
     string alphabet="ACDEFGHIKLMNPQRSTVWY";
-    char letter[N];
+    char letter[N+1];
     strcpy(letter, alphabet.c_str());
     
     char *lib_dir;
