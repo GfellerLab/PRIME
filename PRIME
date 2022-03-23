@@ -1,33 +1,32 @@
 #!/bin/bash
 
 ###############
-# PRIME2.0 is a predictor of HLA ligand displayed at the cell surface.
+# PRIME1.0 is a predictor of immunogenicity for class I epitopes
 #
-# PRIME requires MixMHCpred (version 2.2 or above) to be installed on your computer.
+# PRIME requires MixMHCpred (version 2.0.2 or above) to be installed on your computer.
 #
-# PRIME2.0 can be used freely by academic groups for non-commercial purposes (see license).
+# PRIME1.0 can be used freely by academic groups for non-commercial purposes (see license).
 # The product is provided free of charge, and, therefore, on an "as is"
 #  basis, without warranty of any kind.
 #
 # FOR-PROFIT USERS
-# If you plan to use PRIME (version 2.0) or any data provided with the script in any for-profit
+# If you plan to use PRIME (version 1.0) or any data provided with the script in any for-profit
 # application, you are required to obtain a separate  license.
 # To do so, please contact eauffarth@licr.org at the Ludwig Institute for  Cancer Research Ltd.
 #
-# If you use PRIME2.0 in a publication, please cite:
-# Schmidt et al. Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. Cell Reports Medicine (2021).
-# and
-# Gfeller et al. Improved predictions of immunogenicity reveal SARS-Cov-2 CD8 T-cell epitopes, BioRxiv (2022).
+# If you use PRIME1.0 in a publication, please cite:
+# Schmidt et al., Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. (2020).
 #
 # For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
-
-# Copyright (2022) David Gfeller
+#
+# Copyright (2020) David Gfeller
 ############
 
 
 # Set the location here. This has to be manually done on your machine.
 # Make sure you are not using spaces or other special characters in your paths.
-lib_path="/app/PRIME/lib" #This is important for the github, and needs to be manually changed
+#lib_path="/Users/davidgfeller/Research/LICR/Research/Immunogenicity_pred/PRIME1.0/PRIME1.0/lib"
+lib_path="/app/PRIME/lib"
 
 
 usage="Usage:PRIME -i INPUT -a ALLELES -o OUTPUT "
@@ -49,7 +48,9 @@ Mandatory parameters:
   -a, --allele            List of alleles to be considered, separated by comma (A0101,A0201,B0801)
 
 Optional parameters:
-  -mix, --MixMHCpred      Path of the MixMHCpred executable file (v2.2 or above)
+  -mix, --MixMHCpred      Path of the MixMHCpred executable file (v2.0.2 or above)
+  -pred, --PredBinding    if NetMHCpan, use NetMHCpan instead of MixMHCpred for affinity predicitions (default: MixMHCpred). NetMHCpan is required for non-human MHC alleles
+  -thr, --AffinityThreshod    Use a threshold on affinity values (%rank) (default: 5)
 END
 	exit 0;
 fi
@@ -61,10 +62,11 @@ while [ $# -gt 0 ]; do
 	    -o | --output) output_file=$2; shift 2;;
 	    -a | --allele) alleles=$2; shift 2;;
 	    -mix | --MixMHCpred) MixMHCpred=$2; shift 2;;
+	    -thr | --AffinityThreshold) AffinityThreshold=$2; shift 2;;
+	    -pred | --PredBinding) PredBinding=$2; shift 2;;
 	    *) shift 1;;
 	esac
 done
-
 
 input=`perl -e 'use Cwd "abs_path";print abs_path(shift)' $input`;
 if [[ "$input" =~ " " ]]; then
@@ -91,11 +93,6 @@ if [[ "$output_file" =~ " " ]]; then
     exit 1;
 fi
 
-if [[ "$output_file" =~ "*" ]]; then
-    echo Stars in output path are not supported
-    exit 1;
-fi
-
 if [[ "$output_file" == "" ]]; then
     echo Problem with output file - likely missing directory
     exit 1;
@@ -106,10 +103,36 @@ if [ ! -n "$MixMHCpred" ]; then
     
     MixMHCpred=`which MixMHCpred`;
     if [ ! -n "$MixMHCpred" ]; then
-	echo "MixMHCpred not in your path. Please manually enter the path to MixMHCpred in the input line as '-mix MIXMHCPRED_PATH' (version 2.2 or above).";
+	echo "MixMHCpred not in your path. Please manually enter the path to MixMHCpred in the input line as '-mix MIXMHCPRED_PATH' (version 2.0.2 or above).";
 	exit 1;
     fi
-    
 fi
 
-perl $lib_path/run_PRIME.pl --alleles $alleles --input $input --dir $dir --output $output_file --lib $lib_path --mix $MixMHCpred 
+if [ ! -n "$PredBinding" ]; then
+    PredBinding="MixMHCpred";
+fi
+if [ "$PredBinding" != "MixMHCpred" ] && [ "$PredBinding" != "NetMHCpan" ]
+then
+    echo "Choose one of the two predictor MixMHCpred or NetMHCpan"
+    exit 1
+fi
+
+if [ ! -n "$AffinityThreshold" ]; then
+    AffinityThreshold=5
+fi
+
+NetMHCpan_path="EMPTY"
+
+if [ "$PredBinding" == "NetMHCpan" ]
+then
+    NetMHCpan_path=`which NetMHCpan`;
+    #echo $NetMHCpan_path
+    if [[ $NetMHCpan_path != *"netMHCpan-4"* ]]
+    then
+	echo "NetMHCpan4.0 or above is not installed or not in your path"
+	exit 1;
+    fi
+fi
+
+perl $lib_path/run_PRIME.pl --alleles $alleles --input $input --dir $dir --output $output_file --lib $lib_path --mix $MixMHCpred --pred $PredBinding --thr $AffinityThreshold --net $NetMHCpan_path
+
