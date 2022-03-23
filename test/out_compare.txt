@@ -7,7 +7,7 @@
 # PRIME is freely available for academic users.
 # Private companies should contact eauffarth@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.
 # To cite PRIME2.0, please refer to:
-# Gfeller et al. Improved predictions of immunogenicity reveal SARS-COV2 CD8 T-cell epitopes, BioRxiv (2022).
+# Gfeller et al. Improved predictions of immunogenicity reveal SARS-Cov-2 CD8 T-cell epitopes, BioRxiv (2022).
 ####################
 Peptide	%Rank_bestAllele	Score_bestAllele	%RankBinding_bestAllele	BestAllele	%Rank_A0201	Score_A0201	%RankBinding_A0201	%Rank_A0101	Score_A0101	%RankBinding_A0101
 VMLQAPLFT	1.780	0.024967	4.446	A0201	1.780	0.024967	4.446	11.769	0.003376	15.597
