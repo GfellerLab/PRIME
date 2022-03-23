@@ -6,7 +6,7 @@
 # Private companies should contact eauffarth@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.
 #
 # To cite PRIME, please refer to:
-# Schmidt et al. Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting (2020).
+# Schmidt et al. Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and immunoediting in human cancer, BioRxiv (2020).
 #
 ####################
 Peptide	%Rank_bestAllele	Score_bestAllele	%RankBinding_bestAllele	BestAllele	%Rank_A0201	Score_A0201	%RankBinding_A0201	%Rank_A0101	Score_A0101	%RankBinding_A0101
