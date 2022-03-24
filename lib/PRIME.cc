@@ -22,7 +22,7 @@
 using namespace std;
 
 int map(char c);
-void find_pos(int *p, char* h, int l);
+int find_pos(int *p, char* h, int l);
 
 // This loads the predictions of MixMHCpred and gives as output the predictions of PRIME.
 // To be even faster, we should include this directly in the C++ code of MixMHCpred.
@@ -251,12 +251,7 @@ int main(int argc, char ** argv){
 	npos[n]=new int[Lmax+1];
 	for(int l=Lmin; l<=Lmax; l++){
 	    pos[n][l]=new int[Lmax];
-	    find_pos(pos[n][l], alleles_map[n], l);
-	    ct=0;
-	    while(pos[n][l][ct] != 0){
-		ct++;
-	    }
-	    npos[n][l]=ct;
+	    npos[n][l]=find_pos(pos[n][l], alleles_map[n], l);
 	}
     }
 
@@ -370,7 +365,7 @@ int main(int argc, char ** argv){
 }
 
 
-void find_pos(int *pos, char *h, int l){
+int find_pos(int *pos, char *h, int l){
 
     int ct;
 
@@ -393,7 +388,7 @@ void find_pos(int *pos, char *h, int l){
 	}
     } else if(s=="A0203" || s=="A0204" || s=="A0205" || s=="A0206" || s=="A0220"){ 
 	for(int j=4; j<l-4; j++){
-	    pos[ct]=4;
+	    pos[ct]=j;
 	    ct++;
 	}
 	pos[ct]=l-3;
@@ -402,7 +397,7 @@ void find_pos(int *pos, char *h, int l){
 	ct++;
     } else if(s=="A2501" || s=="A2601"){ 
 	for(int j=4; j<l-4; j++){
-	    pos[ct]=4;
+	    pos[ct]=j;
 	    ct++;
 	}
 	pos[ct]=l-3;
@@ -432,6 +427,8 @@ void find_pos(int *pos, char *h, int l){
 	    ct++;
 	}
     }
+    return(ct);
+    
 }
 
 int map(char c){

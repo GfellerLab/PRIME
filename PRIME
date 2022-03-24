@@ -27,7 +27,8 @@
 
 # Set the location here. This has to be manually done on your machine.
 # Make sure you are not using spaces or other special characters in your paths.
-lib_path="/app/PRIME/lib" #This is important for the github, and needs to be manually changed
+lib_path="/Users/davidgfeller/Research/LICR/Research/Immunogenicity_pred/PRIME2.0/PRIME2.0/lib"
+#lib_path="/PATH_TO_PRIME/lib" #This is important for the github, and needs to be manually changed
 
 
 usage="Usage:PRIME -i INPUT -a ALLELES -o OUTPUT "
@@ -46,7 +47,7 @@ $usage
 Mandatory parameters:
   -i, --input             Absolute or relative path to the input file (fasta format or list of peptides)
   -o, --output            Specify a file for the output
-  -a, --allele            List of alleles to be considered, separated by comma (A0101,A0201,B0801)
+  -a, --allele            List of alleles to be considered, separated by comma (A0101,A2501,B0801,B1801)
 
 Optional parameters:
   -mix, --MixMHCpred      Path of the MixMHCpred executable file (v2.2 or above)

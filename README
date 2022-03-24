@@ -51,7 +51,7 @@ path to the PRIME2.0/lib directory where you have installed the script
 
 6) To test your installation, make sure you are in the PRIME2.0/ directory and run the command (should not take more than a few seconds):
 
-   ./PRIME -i test/test.txt -o test/out.txt -a A0201,A0101
+   ./PRIME -i test/test.txt -o test/out.txt -a A0101,A2501,B0801,B1801 
 
 Apart from specific paths, the output file test/out.txt should be the same as test/out_compare.txt
 
