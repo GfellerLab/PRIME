@@ -65,7 +65,9 @@ After step 3), you also need to compile the PRIME.cc code. Go to
 PRIME2.0/lib and compile with your favorite C++ compiler
 (e.g. g++ -O3 PRIME.cc -o PRIME.x)
 
+For Windows:
 
+We provide a precompiled version of the C++ code. Should you have issues with it, try to recompile it on a Windows machine with the command: g++ -O3 -static PRIME.cc -o PRIME.exe
 
 ########
 RUNNING

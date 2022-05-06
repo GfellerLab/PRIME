@@ -186,13 +186,14 @@ for(my $i=1; $i<$nh; $i++){
     $all_list_pred=$all_list_pred." ".$allele_list_pred[$i];
 }
 
-#print "$lib_dir/PRIME.x $lib_dir $rd $nh $Np $all_list $all_list_pred $output_file $MixMHCpred_dir $input\n";
-if(-e $output_file){
-    print "Overriding existing output file: $output_file\n";
-    system("rm $output_file");
-}
-system("$lib_dir/PRIME.x $lib_dir $rd $nh $Np $all_list $all_list_pred $output_file $MixMHCpred_dir $input");
 
+# Launch different executables depending on the operating system
+my $sys=$^O;
+if ($sys eq "MSWin32" || $sys eq "msys"){
+    system("$lib_dir/PRIME.exe $lib_dir $rd $nh $Np $all_list $all_list_pred $output_file $MixMHCpred_dir $input");
+} else {
+    system("$lib_dir/PRIME.x $lib_dir $rd $nh $Np $all_list $all_list_pred $output_file $MixMHCpred_dir $input");;
+}
 if(! -e $output_file){
     print "PRIME failed...\n";
 }

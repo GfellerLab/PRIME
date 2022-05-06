@@ -84,6 +84,7 @@ fi
 
 dir=`pwd`
 
+echo "" > $output_file
 output_file=`perl -e 'use Cwd "abs_path";print abs_path(shift)' $output_file`;
 
 if [[ "$output_file" =~ " " ]]; then
