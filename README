@@ -28,6 +28,7 @@ NEW FEATURES OF VERSION 2.0
 ########################
 
 - Use of neural networks
+- Incorporation of peptide length
 - Expanded training set of neo-antigens
 - Improved calculation of %Ranks
 
