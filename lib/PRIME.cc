@@ -13,7 +13,7 @@
 #include <stdio.h>      /* printf, fgets */
 #include <stdlib.h>     /* atoi */
 #include <string.h>
-#include <math.h> 
+#include <math.h>
 #include <iostream>
 #include <fstream>
 #include <algorithm>
@@ -31,20 +31,20 @@ int main(int argc, char ** argv){
 
     int Lmin=8;
     int Lmax=14;
-    
+
     int N=20;
-    
+
     string alphabet="ACDEFGHIKLMNPQRSTVWY";
     char letter[N+1];
     strcpy(letter, alphabet.c_str());
-    
+
     char *lib_dir;
     int nh;
     int Np;
     int rd;
     int ct;
     string s;
-    
+
     int inc;
     char **alleles;
     char **alleles_map;
@@ -52,20 +52,20 @@ int main(int argc, char ** argv){
     char *output_file;
     char *input_file;
     char *affinity_dir;
-    
+
     lib_dir = new char[4096];
     output_file = new char[4096];
     input_file = new char[4096];
     affinity_dir = new char[4096];
-    
+
     strcpy(lib_dir, argv[1]);
 
     rd=atoi(argv[2]);
     nh=atoi(argv[3]);
     Np=atoi(argv[4]);
-    
+
     inc=5;
-  
+
     alleles=new char*[nh];
     for(int i=0; i<nh; i++){
 	alleles[i]=new char[4096];
@@ -77,15 +77,15 @@ int main(int argc, char ** argv){
 	alleles_map[i]=new char[4096];
 	strcpy(alleles_map[i], argv[inc+nh+i]);
     }
-    
+
     strcpy(output_file, argv[inc+2*nh]);
     strcpy(affinity_dir, argv[inc+2*nh+1]);
     strcpy(input_file, argv[inc+2*nh+2]);
-  
+
     ///////////////////////////////
     //Load the output of MixMHCpred
     ///////////////////////////////
-    
+
     ifstream file;
     string line;
     char filename[4096];
@@ -97,17 +97,17 @@ int main(int argc, char ** argv){
     double **rank; rank=new double*[Np];
     for(int n=0; n<Np; n++){ rank[n]=new double[nh];}
     int l;
-    
+
 
 
     sprintf(filename, "%s/../temp/MixMHCpred_%d.txt", lib_dir, rd);
-    
+
     file.open(filename);
     for(int i=0; i<12; i++){
 	getline(file, line);
     }
     ct=0;
-    
+
     while (!file.eof()) {
 	getline(file, line);
 	if(line != ""){
@@ -129,22 +129,22 @@ int main(int argc, char ** argv){
 	    }
 	    ct++;
 	}
-	
+
     }
     file.close();
-	
-   
-    
+
+
+
     /////////////////////////////////////////////
     //Load the coefficients of the neural network
     /////////////////////////////////////////////
-    
+
     int Nnode=5;
     int Nfeature=N+1+Lmax-Lmin+1;
     double *bias; bias=new double[Nnode+1];
     double **weight1; weight1=new double*[Nfeature]; for(int j=0; j<Nfeature; j++){weight1[j]=new double[Nnode];}
     double *weight2; weight2=new double[Nfeature];
-    
+
     sprintf(filename, "%s/bias.txt", lib_dir);
     file.open(filename);
     for(int i=0; i<Nnode+1; i++){
@@ -178,13 +178,13 @@ int main(int argc, char ** argv){
 	weight2[i]=atof(pch);
     }
     file.close();
-    
+
     //////////////////////////////////
     //Load the threshold for the ranks
     //////////////////////////////////
 
     int Nbin=0;
-    
+
     double *bin; bin=new double[1000];
     int Nrange=5;
     double *range; range=new double[Nrange];
@@ -197,12 +197,12 @@ int main(int argc, char ** argv){
     }
     bin[Nbin]=log(100);
     Nbin++;
-    
+
     double **rank_thr; rank_thr=new double*[Nbin];
     for(int n=0; n<Nbin; n++) {
 	rank_thr[n]=new double[nh];
     }
-    
+
     for(int h=0; h<nh; h++){
 	sprintf(filename, "%s/PerRank/%s.txt", lib_dir, alleles_map[h]);
 	file.open(filename);
@@ -231,18 +231,18 @@ int main(int argc, char ** argv){
 	    } else {
 		//This is only useful to compute the threshold for the rank, if PerRank/A0201.txt file does not exist.
 		cout<<"Missing file PerRank/A0201.txt"<<endl;
-		for(int n=0; n<Nbin; n++) {  
+		for(int n=0; n<Nbin; n++) {
 		    rank_thr[n][h]=0.1*(Nbin-n);
 		}
 	    }
 	}
     }
-    
+
     //////////////////////////
     //Compute the PRIME scores
     //////////////////////////
 
-    
+
     //Precompute the position for each allele and each length
     int ***pos; pos=new int**[nh];
     int **npos; npos=new int*[nh];
@@ -255,11 +255,11 @@ int main(int argc, char ** argv){
 	}
     }
 
-   
+
     FILE *pFile;
     pFile=fopen(output_file,"w");
-    
-    
+
+
     fprintf (pFile, "####################\n");
     fprintf (pFile, "# Output from PRIME (v2.0)\n");
     fprintf (pFile, "# Alleles: %s",alleles[0]); for(int h=1; h<nh; h++){fprintf (pFile, ", %s", alleles[h]);} fprintf (pFile, "\n");
@@ -267,9 +267,9 @@ int main(int argc, char ** argv){
     fprintf (pFile, "# Input file: %s\n", input_file);
     fprintf (pFile, "#\n");
     fprintf (pFile, "# PRIME is freely available for academic users.\n");
-    fprintf (pFile, "# Private companies should contact Nadette Bulgin (nbulgin@lcr.org) at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n");
+    fprintf (pFile, "# Private companies should contact eauffarth@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n");
     fprintf (pFile, "# To cite PRIME2.0, please refer to:\n");
-    fprintf (pFile, "# Gfeller et al. Predictions of immunogenicity reveal potent SARS-Cov-2 CD8 T-cell epitopes, BioRxiv (2022).\n");
+    fprintf (pFile, "# Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).\n");
     fprintf (pFile, "####################\n");
 
     fprintf (pFile, "Peptide\t\%%Rank_bestAllele\tScore_bestAllele\t\%%RankBinding_bestAllele\tBestAllele");
@@ -277,7 +277,7 @@ int main(int argc, char ** argv){
 	fprintf (pFile, "\t\%%Rank_%s\tScore_%s\t\%%RankBinding_%s", alleles[n], alleles[n], alleles[n]);
     }
     fprintf (pFile, "\n");
-    
+
     double fr[N];
     int lp, k;
     int mp;
@@ -287,7 +287,7 @@ int main(int argc, char ** argv){
 
     int min_pos;
     double min_rank;
-    
+
     for(int i=0; i<Np; i++){
 	l=lpep[i];
 	for(int n=0; n<nh; n++){
@@ -296,7 +296,7 @@ int main(int argc, char ** argv){
 	    for(int p=0; p<N; p++){
 		fr[p]=0;
 	    }
-  
+
 	    for(int p=0; p<npos[n][l]; p++){
 		mp=pos[n][l][p];
 		fr[peptide[i][mp]]=fr[peptide[i][mp]]+1;
@@ -320,9 +320,9 @@ int main(int argc, char ** argv){
 	    }
 	    score[n]=1/(1+exp(-score[n]));
 
-	    
+
 	    //Compute the %rank
-	    
+
 	    k=0;
 	    while (score[n]<rank_thr[k][n]) {
 		k++;
@@ -361,7 +361,7 @@ int main(int argc, char ** argv){
     }
     fclose (pFile);
 
-    
+
 }
 
 
@@ -370,7 +370,7 @@ int find_pos(int *pos, char *h, int l){
     int ct;
 
     //Ideally, read a file with these information
-    
+
     std::string s(h);
 
     ct=0;
@@ -381,12 +381,12 @@ int find_pos(int *pos, char *h, int l){
 	    pos[ct]=j;
 	    ct++;
 	}
-    } else if(s=="A0201" || s=="A0202" || s=="A0207" || s=="A0211"){ 
+    } else if(s=="A0201" || s=="A0202" || s=="A0207" || s=="A0211"){
 	for(int j=4; j<l-1; j++){
 	    pos[ct]=j;
 	    ct++;
 	}
-    } else if(s=="A0203" || s=="A0204" || s=="A0205" || s=="A0206" || s=="A0220"){ 
+    } else if(s=="A0203" || s=="A0204" || s=="A0205" || s=="A0206" || s=="A0220"){
 	for(int j=4; j<l-4; j++){
 	    pos[ct]=j;
 	    ct++;
@@ -395,7 +395,7 @@ int find_pos(int *pos, char *h, int l){
 	ct++;
 	pos[ct]=l-2;
 	ct++;
-    } else if(s=="A2501" || s=="A2601"){ 
+    } else if(s=="A2501" || s=="A2601"){
 	for(int j=4; j<l-4; j++){
 	    pos[ct]=j;
 	    ct++;
@@ -409,12 +409,12 @@ int find_pos(int *pos, char *h, int l){
 	}
 	pos[ct]=l-2;
 	ct++;
-    } else if(s == "A3201" || s == "B1803" || s == "B3901" || s == "B3905" || s == "B3906" || s == "B3924" || s == "B4601" || s == "B4801" || s == "C0102"){ 
+    } else if(s == "A3201" || s == "B1803" || s == "B3901" || s == "B3905" || s == "B3906" || s == "B3924" || s == "B4601" || s == "B4801" || s == "C0102"){
 	for(int j=3; j<l-2; j++){
 	    pos[ct]=j;
 	    ct++;
 	}
-    } else if(s=="H-2-Kb"){ 
+    } else if(s=="H-2-Kb"){
 	pos[ct]=3;
 	ct++;
 	for(int j=6; j<l-1; j++){
@@ -422,19 +422,19 @@ int find_pos(int *pos, char *h, int l){
 	    ct++;
 	}
     } else{
-	for(int j=3; j<l-1; j++){ 
+	for(int j=3; j<l-1; j++){
 	    pos[ct]=j;
 	    ct++;
 	}
     }
     return(ct);
-    
+
 }
 
 int map(char c){
 
     //Should do a binary search, but works fine like this
-    
+
     int p;
 
     if(c < 'M'){
