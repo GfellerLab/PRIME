@@ -267,7 +267,7 @@ int main(int argc, char ** argv){
     fprintf (pFile, "# Input file: %s\n", input_file);
     fprintf (pFile, "#\n");
     fprintf (pFile, "# PRIME is freely available for academic users.\n");
-    fprintf (pFile, "# Private companies should contact eauffarth@licr.org at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n");
+    fprintf (pFile, "# Private companies should contact Nadette Bulgin (nbulgin@lcr.org) at the Ludwig Institute for Cancer Research Ltd for commercial licenses.\n");
     fprintf (pFile, "# To cite PRIME2.0, please refer to:\n");
     fprintf (pFile, "# Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).\n");
     fprintf (pFile, "####################\n");
