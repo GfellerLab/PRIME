@@ -1,35 +1,37 @@
 #!/bin/bash
 
 ###############
-# PRIME2.0 is a predictor of HLA ligand displayed at the cell surface.
+# PRIME2.1 is a predictor of MHC ligand displayed at the cell surface.
 #
-# PRIME requires MixMHCpred (version 2.2 or above) to be installed on your computer.
+# PRIME requires MixMHCpred (version 3.0 or above) to be installed on your computer.
 #
-# PRIME2.0 can be used freely by academic groups for non-commercial purposes (see license).
+# PRIME2.1 can be used freely by academic groups for non-commercial purposes (see license).
 # The product is provided free of charge, and, therefore, on an "as is"
 #  basis, without warranty of any kind.
 #
 # FOR-PROFIT USERS
-# If you plan to use PRIME (version 2.0) or any data provided with the script in any for-profit
+# If you plan to use PRIME (version 2.1) or any data provided with the script in any for-profit
 # application, you are required to obtain a separate  license.
 # To do so, please contact Nadette Bulgin (nbulgin@lcr.org) at the Ludwig Institute for  Cancer Research Ltd.
 #
-# If you use PRIME2.0 in a publication, please cite:
-# Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).
+# If you use PRIME2.1 in a publication, please cite:
+# Tadros et al. BioRxiv (2024).
 #
-# For the older version (PRIME1.0), please cite:
-# Schmidt et al., Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. Cell Reports Medicine (2021).
+# For the older version (PRIME2.0), please cite:
+# Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).
 #
 # For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
 
-# Copyright (2022) David Gfeller
+# Copyright (2024) David Gfeller
 ############
 
 
-# Set the location here. This has to be manually done on your machine.
-# Make sure you are not using spaces or other special characters in your paths.
-lib_path="/PATH_TO_PRIME/lib" #This is important for the github, and needs to be manually changed
 
+# Get the absolute path to the directory containing the executable file
+executable_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+# Get the absolute path to the directory containing the libraries
+lib_path="$executable_dir/lib"
 
 usage="Usage:PRIME -i INPUT -a ALLELES -o OUTPUT "
 
@@ -108,7 +110,7 @@ if [ ! -n "$MixMHCpred" ]; then
 
     MixMHCpred=`which MixMHCpred`;
     if [ ! -n "$MixMHCpred" ]; then
-	echo "MixMHCpred not in your path. Please manually enter the path to MixMHCpred in the input line as '-mix MIXMHCPRED_PATH' (version 2.2 or above).";
+	echo "MixMHCpred not in your path. Please manually enter the path to MixMHCpred in the input line as '-mix MIXMHCPRED_PATH' (version 3.0 or above).";
 	exit 1;
     fi
 

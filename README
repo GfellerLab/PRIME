@@ -1,37 +1,33 @@
 
 ###############
-# PRIME is a PRedictor of class I IMmunogenic Epitopes. It combines predictions of binding to HLA-I molecules and propensity for TCR recognition.
+# PRIME is a PRedictor of class I IMmunogenic Epitopes. It combines predictions of binding to MHC-I molecules and propensity for TCR recognition.
 #
-# PRIME2.0 can be used freely by academic groups for non-commercial purposes (see license).
+# PRIME2.1 can be used freely by academic groups for non-commercial purposes (see license).
 # The product is provided free of charge, and, therefore, on an "as is"
 #  basis, without warranty of any kind.
 #
 # FOR-PROFIT USERS
-# If you plan to use PRIME (version 2.0) or any data provided with the script in any for-profit
+# If you plan to use PRIME (version 2.1) or any data provided with the script in any for-profit
 # application, you are required to obtain a separate license.
 # To do so, please contact Nadette Bulgin (nbulgin@lcr.org) at the Ludwig Institute for Cancer Research Ltd.
 #
-# If you use PRIME2.0 in a publication, please cite:
-# Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).
+# If you use PRIME2.1 in a publication, please cite:
+# Tadros et al. BioRxiv (2024).
 #
-# For the older version (PRIME1.0), please cite:
-# Schmidt et al., Prediction of neo-epitope immunogenicity reveals TCR recognition determinants and provides insight into immunoediting. Cell Reports Medicine (2021).
+# For the older version (PRIME2.0), please cite:
+# Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).
 #
 # For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
 #
-# Copyright (2021) David Gfeller
+# Copyright (2024) David Gfeller
 ###############
 
 
 ########################
-NEW FEATURES OF VERSION 2.0
+NEW FEATURES OF VERSION 2.1
 ########################
 
-- Use of neural networks
-- Incorporation of peptide length
-- Expanded training set of neo-antigens
-- Improved calculation of %Ranks
-
+- Expanded training set of MHC-I alleles from human and other species
 
 ############
 INSTALLATION
@@ -39,19 +35,16 @@ INSTALLATION
 
 For Mac and Linux:
 
-1) Download the PRIME2.0.zip file and move it to a directory
+1) Download the PRIME2.1.zip file and move it to a directory
 of your choice, where you have writing permissions.
 
-2) Unzip the PRIME2.0.zip package.
+2) Unzip the PRIME2.1.zip package.
 
-3) Open the PRIME file and replace lib_path by the
-path to the PRIME2.0/lib directory where you have installed the script
+3) To run it from anywhere on your computer, add the PRIME2.1 directory to your path.
 
-4) To run it from anywhere on your computer, add the PRIME2.0 directory to your path.
+4) PRIME requires MixMHCpred v3.0 or above to be installed on your computer (https://github.com/GfellerLab/MixMHCpred) and be in your PATH (if not in your PATH, you can use the '-mix PATH_OF_MIXMHCPRED_EXEC' command line option).
 
-5) PRIME requires MixMHCpred v2.2 or above to be installed on your computer (https://github.com/GfellerLab/MixMHCpred) and be in your PATH (if not in your PATH, you can use the '-mix PATH_OF_MIXMHCPRED_EXEC' command line option).
-
-6) To test your installation, make sure you are in the PRIME2.0/ directory and run the command (should not take more than a few seconds):
+6) To test your installation, make sure you are in the PRIME2.1 directory and run the command (should not take more than a few seconds):
 
    ./PRIME -i test/test.txt -o test/out.txt -a A0101,A2501,B0801,B1801
 
@@ -64,7 +57,7 @@ Depending on your security setup, you may have to manually allow PRIME executabl
 For Linux:
 
 After step 3), you also need to compile the PRIME.cc code. Go to
-PRIME2.0/lib and compile with your favorite C++ compiler
+PRIME2.1/lib and compile with your favorite C++ compiler
 (e.g. g++ -O3 PRIME.cc -o PRIME.x)
 
 For Windows:
@@ -95,7 +88,7 @@ The name of the output file. Do NOT use filenames with special characters like '
 
 Optional parameters:
 
--mix: Give the full path of MixMHCpred executable (required if MixMHCpred is not in your PATH). Version 2.2 of MixMHCpred or above is required.
+-mix: Give the full path of MixMHCpred executable (required if MixMHCpred is not in your PATH). Version 3.0 of MixMHCpred or above is required.
 
 ########
 Output
