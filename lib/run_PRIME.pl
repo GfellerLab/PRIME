@@ -34,12 +34,12 @@ my $MixMHCpred_version=`$MixMHCpred_dir -h | head -1`;
 
 $MixMHCpred_version =~ s/\r?\n$//;
 
-if(index($MixMHCpred_version, "MixMHCpred2.1")>=0 || index($MixMHCpred_version, "MixMHCpred2.0")>=0){
+if(index($MixMHCpred_version, "MixMHCpred2.2")>=0 || index($MixMHCpred_version, "MixMHCpred2.1")>=0){
     print "\n######\n";
     print "WARNING:\n";
     print "It appears that you are using an old version of MixMHCpred ($MixMHCpred_version):\n";
     print "$MixMHCpred_dir\n";
-    print "Make sure you use version 2.2 or above.\n";
+    print "Make sure you use version 3.0 or above.\n";
     print "#######\n\n";
 }
 
