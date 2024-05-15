@@ -164,10 +164,10 @@ my $rd=int(rand(1000000));
 
 #Run MixMHCpred
 
-my $th=$allele_list_pred[0];
-if(scalar @allele_list_pred > 1){
-    for(my $i=1; $i<scalar @allele_list_pred; $i++){
-	$th=$th.",".$allele_list_pred[$i];
+my $th=$allele_list[0];
+if(scalar @allele_list > 1){
+    for(my $i=1; $i<scalar @allele_list; $i++){
+	$th=$th.",".$allele_list[$i];
     }
 }
 system("$MixMHCpred_dir -i $input -o $lib_dir/../temp/MixMHCpred_$rd.txt -a $th");
