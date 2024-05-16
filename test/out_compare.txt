@@ -7,7 +7,7 @@
 # PRIME is freely available for academic users.
 # Private companies should contact Nadette Bulgin (nbulgin@lcr.org) at the Ludwig Institute for Cancer Research Ltd for commercial licenses.
 # To cite PRIME2.1, please refer to:
-# Tadros et al. BioRxiv (2024).
+# Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).
 ####################
 Peptide	%Rank_bestAllele	Score_bestAllele	%RankBinding_bestAllele	BestAllele	%Rank_A0101	Score_A0101	%RankBinding_A0101	%Rank_A2501	Score_A2501	%RankBinding_A2501	%Rank_B0801	Score_B0801	%RankBinding_B0801	%Rank_B1801	Score_B1801	%RankBinding_B1801
 VMLQAPLFT	3.901	0.010242	7.164	B0801	11.801	0.003863	18.503	29.479	0.001839	52.739	3.901	0.010242	7.164	19.057	0.002467	32.326
