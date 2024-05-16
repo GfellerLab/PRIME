@@ -14,10 +14,7 @@
 # application, you are required to obtain a separate  license.
 # To do so, please contact Nadette Bulgin (nbulgin@lcr.org) at the Ludwig Institute for  Cancer Research Ltd.
 #
-# If you use PRIME2.1 in a publication, please cite:
-# Tadros et al. BioRxiv (2024).
-#
-# For the older version (PRIME2.0), please cite:
+# If you use PRIME in a publication, please cite:
 # Gfeller et al. Improved predictions of antigen presentation and TCR recognition with MixMHCpred2.2 and PRIME2.0 reveal potent SARS-CoV-2 CD8+ T-cell epitopes , Cell Systems (2023).
 #
 # For scientific questions, please contact David Gfeller (David.Gfeller@unil.ch)
