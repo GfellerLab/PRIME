@@ -48,6 +48,7 @@ int main(int argc, char ** argv){
     int inc;
     char **alleles;
     char **alleles_map;
+	char **alleles_map_prank;
 
     char *output_file;
     char *input_file;
@@ -78,9 +79,15 @@ int main(int argc, char ** argv){
 	strcpy(alleles_map[i], argv[inc+nh+i]);
     }
 
-    strcpy(output_file, argv[inc+2*nh]);
-    strcpy(affinity_dir, argv[inc+2*nh+1]);
-    strcpy(input_file, argv[inc+2*nh+2]);
+	alleles_map_prank=new char*[2*nh];
+    for(int i=0; i<nh; i++){
+	alleles_map_prank[i]=new char[4096];
+	strcpy(alleles_map_prank[i], argv[inc+2*nh+i]);
+    }
+
+    strcpy(output_file, argv[inc+3*nh]);
+    strcpy(affinity_dir, argv[inc+3*nh+1]);
+    strcpy(input_file, argv[inc+3*nh+2]);
 
     ///////////////////////////////
     //Load the output of MixMHCpred
@@ -204,7 +211,7 @@ int main(int argc, char ** argv){
     }
 
     for(int h=0; h<nh; h++){
-	sprintf(filename, "%s/PerRank/%s.txt", lib_dir, alleles_map[h]);
+	sprintf(filename, "%s/PerRank/%s.txt", lib_dir, alleles_map_prank[h]);
 	file.open(filename);
 	if(file){
 	    for(int n=0; n<Nbin; n++) {
@@ -216,7 +223,7 @@ int main(int argc, char ** argv){
 	    }
 	    file.close();
 	} else {  // If the precomputed ranks are not available for this allele, use those from A0201 - but this should never happen.
-	    cout<<"WARNING: missing file of pre-computed ranks for "<<alleles_map[h]<<", using values from A0201"<<endl;
+	    cout<<"WARNING: missing file of pre-computed ranks for "<<alleles_map_prank[h]<<", using values from A0201"<<endl;
 	    sprintf(filename, "%s/PerRank/A0201.txt", lib_dir);
 	    file.open(filename);
 	    if(file){

@@ -72,7 +72,7 @@ foreach $h (@allele_input){
     }
     if(substr($th, 0, 3) eq "H-2"){
 	$th="H2".substr($th, 3,  length($th)-2); # Make it compatible with mouse alleles (future work)
-    } 
+    }
     push @allele_list, $th;
 }
 
@@ -117,12 +117,12 @@ foreach $p (@peptide){
     foreach $s (@seq){
 	if(!exists $map{$s}){
 	    die "Error in input sequence - unknown amino acids $s: $p\n";
-	} 
+	}
 	$ct2++;
     }
     if($ct2 < $Lmin || $ct2 > $Lmax){
 	die "Incompatible peptide length: $p\t$ct2. \nOnly peptides of length $Lmin to $Lmax are supported\n";
-    } 
+    }
 }
 
 #######################################
@@ -150,9 +150,36 @@ for(my $i=0; $i<$nh; $i++){
 	die "Predictions cannot be run for $allele_list[$i]\n";
     } else{
 	push @allele_list_pred,$maph{$allele_list[$i]};
-	
+
     }
 }
+
+my @allele_list_pred_prank=();
+
+my %pres_prank=();
+my %maph_prank=();
+
+open IN, "$lib_dir/alleles_mapping_prank.txt", or die;
+while($l=<IN>){
+    $l =~ s/\r?\n$//;
+    if($l ne ""){
+	my @a=split(' ', $l);
+	$maph_prank{$a[0]}=$a[1];
+	$pres_prank{$a[0]}=1;
+    }
+}
+close IN;
+
+for(my $i=0; $i<$nh; $i++){
+    if(!exists $pres_prank{$allele_list[$i]}){
+	die "Predictions cannot be run for $allele_list[$i]\n";
+    } else{
+	push @allele_list_pred_prank,$maph_prank{$allele_list[$i]};
+
+    }
+}
+
+
 
 
 ################################
@@ -180,19 +207,21 @@ my $nh=scalar @allele_list;
 my $Np=scalar @peptide;
 my $all_list=$allele_list[0];
 my $all_list_pred=$allele_list_pred[0];
+my $all_list_pred_prank=$allele_list_pred_prank[0];
 
 for(my $i=1; $i<$nh; $i++){
     $all_list=$all_list." ".$allele_list[$i];
     $all_list_pred=$all_list_pred." ".$allele_list_pred[$i];
+    $all_list_pred_prank=$all_list_pred_prank." ".$allele_list_pred_prank[$i];
 }
 
 
 # Launch different executables depending on the operating system
 my $sys=$^O;
 if ($sys eq "MSWin32" || $sys eq "msys"){
-    system("$lib_dir/PRIME.exe $lib_dir $rd $nh $Np $all_list $all_list_pred $output_file $MixMHCpred_dir $input");
+    system("$lib_dir/PRIME.exe $lib_dir $rd $nh $Np $all_list $all_list_pred $all_list_pred_prank $output_file $MixMHCpred_dir $input");
 } else {
-    system("$lib_dir/PRIME.x $lib_dir $rd $nh $Np $all_list $all_list_pred $output_file $MixMHCpred_dir $input");;
+    system("$lib_dir/PRIME.x $lib_dir $rd $nh $Np $all_list $all_list_pred $all_list_pred_prank $output_file $MixMHCpred_dir $input");;
 }
 if(! -e $output_file){
     print "PRIME failed...\n";
